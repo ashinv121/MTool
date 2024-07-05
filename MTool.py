@@ -35,6 +35,8 @@ class ConnectionSettingsWindow:
         # Button frame
         self.frame2 = ttk.Frame(self.conn_screen, borderwidth=2, relief="groove")
         self.frame2.grid(row=0, column=1, padx=2, pady=2, sticky="nsew")
+        self.frame2.columnconfigure(0, weight=1)
+        self.frame2.rowconfigure(0, weight=1)
         ttk.Button(self.frame2, text="OK", width=15, command=self.on_ok).grid(row=0, column=0, padx=5, pady=2, sticky="nsew")
         ttk.Button(self.frame2, text="CANCEL", width=15, command=self.conn_screen.destroy).grid(row=1, column=0, padx=5, pady=2, sticky="nsew")
         
@@ -81,15 +83,17 @@ class ConnectionSettingsWindow:
         self.frame4_2 = ttk.Frame(self.frame4, borderwidth=2, relief="groove")
         self.frame4_2.grid(row=1, column=0, padx=2, pady=2, sticky="nsew")
         ttk.Label(self.frame4_2, text="Response Timeout").grid(row=0, column=0, columnspan=2, padx=2, pady=2)
-        self.response_timeout = tk.IntVar()
-        ttk.Entry(self.frame4_2, textvariable=self.response_timeout, width=10).grid(row=1, column=0, padx=2, pady=2)
+        self.response_timeout = tk.IntVar(value=100)
+        self.response_timeout_entry=ttk.Entry(self.frame4_2, textvariable=self.response_timeout, width=10)
+        self.response_timeout_entry.grid(row=1, column=0, padx=2, pady=2, sticky="nsew")
         ttk.Label(self.frame4_2, text="[ms]").grid(row=1, column=1, padx=2, pady=2)
         
         self.frame4_3 = ttk.Frame(self.frame4, borderwidth=2, relief="groove")
         self.frame4_3.grid(row=2, column=0, padx=2, pady=2, sticky="nsew")
         ttk.Label(self.frame4_3, text="Delay Between Polls").grid(row=0, column=0, columnspan=2, padx=2, pady=2)
-        self.delay_between_polls = tk.IntVar()
-        ttk.Entry(self.frame4_3, textvariable=self.delay_between_polls, width=10).grid(row=1, column=0, padx=2, pady=2)
+        self.delay_between_polls = tk.IntVar(value=100)
+        self.poll_number_entry=ttk.Entry(self.frame4_3, textvariable=self.delay_between_polls, width=10)
+        self.poll_number_entry.grid(row=1, column=0, padx=2, pady=2,sticky="nsew")
         ttk.Label(self.frame4_3, text="[ms]").grid(row=1, column=1, padx=2, pady=2)
         
         # Modbus TCP/UDP settings frame
@@ -103,17 +107,18 @@ class ConnectionSettingsWindow:
         self.ip_address_entry=ttk.Entry(self.frame5, textvariable=self.ip_address, width=20)
         self.ip_address_entry.grid(row=2, column=0, padx=2, pady=2)
         
-        ttk.Label(self.frame5, text="PORT").grid(row=1, column=1, padx=2, pady=2)
+        ttk.Label(self.frame5, text="Port").grid(row=1, column=1, padx=2, pady=2)
         self.port = tk.IntVar(value=502)
         self.port_entry=ttk.Entry(self.frame5, textvariable=self.port, width=10)
         self.port_entry.grid(row=2, column=1, padx=2, pady=2)
         
-        ttk.Label(self.frame5, text="TIME OUT").grid(row=1, column=2, padx=2, pady=2)
-        self.timeout = tk.IntVar()
-        self.timeout_entry=ttk.Entry(self.frame5, textvariable=self.timeout, width=10)
-        self.timeout_entry.grid(row=2, column=2, padx=2, pady=2)
+        ttk.Label(self.frame5, text="Con Timeout").grid(row=1, column=2, padx=2, pady=2)
+        self.con_timeout = tk.IntVar(value=100)
+        self.con_timeout_entry=ttk.Entry(self.frame5, textvariable=self.con_timeout, width=10)
+        self.con_timeout_entry.grid(row=2, column=2, padx=2, pady=2)
         self.update_settings_state()
 
+        #Enter and ESC button for Connection screen.
         self.conn_screen.bind("<Return>", lambda event: self.on_ok())
         self.conn_screen.bind("<Escape>", lambda event: self.conn_screen.destroy())
 
@@ -139,18 +144,62 @@ class ConnectionSettingsWindow:
         modbus_udp_state = 'normal' if connection_type == "Modbus UDP" else 'disabled'
         self.ip_address_entry.config(state='normal' if connection_type in ["Modbus TCP", "Modbus UDP"] else 'disabled')
         self.port_entry.config(state='normal' if connection_type in ["Modbus TCP", "Modbus UDP"] else 'disabled')
-        self.timeout_entry.config(state=modbus_tcp_state)
+        self.con_timeout_entry.config(state=modbus_tcp_state)
     
-    #function to validate Ip address 
-    def validate_ip_adr(self,ip):
+    def validate_ip_adr(self, ip):
         pattern = re.compile(r"^(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])\.(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])\.(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])\.(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])$")
         return pattern.match(ip)
 
-        
+    def validate_port_number(self, port_str):
+        try:
+            port = int(port_str)
+            if not (1 <= port <= 65535):
+                return False, "Port number must be between 1 and 65535."
+            return True, ""
+        except ValueError:
+            return False, "Please enter a valid integer for the port number."
 
-    def on_ok(self):      
+    def validate_response_timeout_setting(self, timeout_ms):
+        try:
+            timeout_ms = int(timeout_ms)
+            if not (50 <= timeout_ms <= 10000):
+                return False, "Response timeout must be between 50 and 10000."
+            return True, ""
+        except ValueError:
+            return False, "Please enter a valid integer for the Response timeout."
+
+    def validate_poll_setting(self, time_ms):
+        try:
+            time_ms = int(time_ms)
+            if not (0 <= time_ms <= 10000):
+                return False, "Poll time must be between 100 and 10000."
+            return True, ""
+        except ValueError:
+            return False, "Please enter a valid integer for the Poll time."
+
+    def validate_connection_timeout_setting(self, timeout_ms):
+        try:
+            timeout_ms = int(timeout_ms)
+            if not (50 <= timeout_ms <= 10000):
+                return False, "Connection timeout must be between 50 and 10000."
+            return True, ""
+        except ValueError:
+            return False, "Please enter a valid integer for the Connection timeout."
+
+    def on_ok(self):
+
+        connection_type = self.connection_type.get()
+        valid, error_message = self.validate_response_timeout_setting(self.response_timeout_entry.get())
+        if not valid:
+            tk.messagebox.showerror("Invalid Response Timeout", error_message)
+            return
+            
+        valid, error_message = self.validate_poll_setting(self.poll_number_entry.get())
+        if not valid:
+                tk.messagebox.showerror("Invalid Poll Setting", error_message)
+                return              
         # Implement the logic to handle the OK button click event
-        if self.connection_type.get() == "Serial":
+        if connection_type == "Serial":
             print("COM port:", self.com_port.get())
             print("Baud rate:", self.baud_rate.get())
             print("Parity option:", self.parity_option.get())
@@ -159,10 +208,23 @@ class ConnectionSettingsWindow:
             print("Mode ASCII:", self.mode_ascii.get())
             print("Response timeout:", self.response_timeout.get())
             print("Delay between polls:", self.delay_between_polls.get())
-        elif self.connection_type.get() in ["Modbus TCP","Modbus UDP"]:
+
+        elif connection_type in ["Modbus TCP", "Modbus UDP"]:
             if not self.validate_ip_adr(self.ip_address_entry.get()):
                 tk.messagebox.showerror("Invalid IP", "Please enter a valid IP address.")
                 return
+            
+            valid, error_message = self.validate_port_number(self.port_entry.get())
+            if not valid:
+                tk.messagebox.showerror("Invalid Port Number", error_message)
+                return
+            
+            if not connection_type == "Modbus UDP":
+                valid, error_message = self.validate_connection_timeout_setting(self.con_timeout_entry.get())
+                if not valid:
+                    tk.messagebox.showerror("Invalid Poll Setting", error_message)
+                return
+
         self.conn_screen.destroy()
 
 def open_conn_st_screen():
