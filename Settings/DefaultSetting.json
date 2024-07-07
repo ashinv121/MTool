@@ -1,0 +1,17 @@
+{
+    "connection": {
+      "connection_type": "Serial",
+      "com_port": "COM1",
+      "baud_rate": "9600 baud",
+      "parity_option": "None parity",
+      "stopbit_option": "1 Stop Bit",
+      "mode_rtu": 1,
+      "mode_ascii": 0,
+      "response_timeout": 100,
+      "delay_between_polls": 100,
+      "ip_address": "192.168.3.254",
+      "port": 502,
+      "con_timeout": 100
+    }
+  }
+  

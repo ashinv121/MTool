@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
 import re
+from Settings import save_open
 
 class ConnectionSettingsWindow:
     def __init__(self, parent):
@@ -124,9 +125,6 @@ class ConnectionSettingsWindow:
 
         self.conn_screen.grab_set()
         
-
-
-
     def update_settings_state(self, event=None):
         connection_type = self.connection_type.get()
         
@@ -230,6 +228,8 @@ class ConnectionSettingsWindow:
 def open_conn_st_screen():
     ConnectionSettingsWindow(root)
 
+
+
 root = tk.Tk()
 root.geometry("350x450")
 root.minsize(350, 450)
@@ -243,7 +243,9 @@ root.config(menu=menu)
 filemenu = tk.Menu(menu, tearoff=0)
 menu.add_cascade(label='File', menu=filemenu)
 filemenu.add_command(label='New')
-filemenu.add_command(label='Open...')
+filemenu.add_command(label='Open', command=save_open.open_project)
+filemenu.add_command(label="Save")
+filemenu.add_command(label="Save As", command=save_open.save_as_project)
 filemenu.add_command(label='Exit', command=root.quit)
 
 # Connection menu
