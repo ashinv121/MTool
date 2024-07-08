@@ -4,16 +4,15 @@ import json
 def save_project():
     pass
 
-def save_as_project():
+def save_as_project(data):
     file_path = filedialog.asksaveasfilename(
         defaultextension=".json",
         filetypes=(("Json Files", "*.json"), ("All Files", "*.*")),
         title="Save File"
     )
+
     if file_path:
-        data = {"Name": "Mtool",
-                "Version":1.0
-                }
+        data = data
         try:
             with open(file_path, 'w') as file:
                 json.dump(data, file, indent=4)

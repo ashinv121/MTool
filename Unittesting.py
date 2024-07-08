@@ -1,7 +1,7 @@
 import unittest
 import tkinter as tk
 from tkinter import ttk, messagebox, filedialog
-from MTool import ConnectionSettingsWindow, open_project, save_as_project
+from main import ConnectionSettingsWindow, open_project, save_as_project
 
 
 class TestConnectionSettings(unittest.TestCase):

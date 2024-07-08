@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
 import re
-from Settings import save_open
+from modules import project_file_management
 
 class ConnectionSettingsWindow:
     def __init__(self, parent):
@@ -198,65 +198,42 @@ class ConnectionSettingsWindow:
                 return              
         # Implement the logic to handle the OK button click event
         if connection_type == "Serial":
-            print("COM port:", self.com_port.get())
-            print("Baud rate:", self.baud_rate.get())
-            print("Parity option:", self.parity_option.get())
-            print("Stop bit option:", self.stopbit_option.get())
-            print("Mode RTU:", self.mode_rtu.get())
-            print("Mode ASCII:", self.mode_ascii.get())
-            print("Response timeout:", self.response_timeout.get())
-            print("Delay between polls:", self.delay_between_polls.get())
+            
+            self.connection_data={"COM port": self.com_port.get(),
+            "Baud rate": self.baud_rate.get(),
+            "Parity option": self.parity_option.get(),
+            "Stop bit option": self.stopbit_option.get(),
+            "Mode RTU":self.mode_rtu.get(),
+            "Mode ASCII":self.mode_ascii.get(),
+            "Response timeout": self.response_timeout.get(),
+            "Delay between polls": self.delay_between_polls.get()
+            }
 
+            print(self.connection_data)
+            
         elif connection_type in ["Modbus TCP", "Modbus UDP"]:
             if not self.validate_ip_adr(self.ip_address_entry.get()):
                 tk.messagebox.showerror("Invalid IP", "Please enter a valid IP address.")
                 return
-            
             valid, error_message = self.validate_port_number(self.port_entry.get())
             if not valid:
                 tk.messagebox.showerror("Invalid Port Number", error_message)
                 return
-            
-            if not connection_type == "Modbus UDP":
+            self.connection_data={
+                    "Ip address" :self.ip_address_entry.get(),
+                    "Port":self.port_entry.get(),
+                    "Response timeout": self.response_timeout.get(),
+                    "Delay between polls": self.delay_between_polls.get()
+                    }
+            if  connection_type == "Modbus TCP":
                 valid, error_message = self.validate_connection_timeout_setting(self.con_timeout_entry.get())
                 if not valid:
                     tk.messagebox.showerror("Invalid Poll Setting", error_message)
-                return
+                    return
+                self.connection_data["connection timeout"]=self.con_timeout_entry.get()
+            print(self.connection_data)
 
         self.conn_screen.destroy()
 
-def open_conn_st_screen():
-    ConnectionSettingsWindow(root)
-
-
-
-root = tk.Tk()
-root.geometry("350x450")
-root.minsize(350, 450)
-root.title("M Tool")
-
-# Create a menu
-menu = tk.Menu(root)
-root.config(menu=menu)
-
-# File menu
-filemenu = tk.Menu(menu, tearoff=0)
-menu.add_cascade(label='File', menu=filemenu)
-filemenu.add_command(label='New')
-filemenu.add_command(label='Open', command=save_open.open_project)
-filemenu.add_command(label="Save")
-filemenu.add_command(label="Save As", command=save_open.save_as_project)
-filemenu.add_command(label='Exit', command=root.quit)
-
-# Connection menu
-connectionmenu = tk.Menu(menu, tearoff=0)
-menu.add_cascade(label='Connection', menu=connectionmenu)
-connectionmenu.add_command(label="Connect", command=open_conn_st_screen)
-connectionmenu.add_command(label="Disconnect", command=open_conn_st_screen)
-
-# Help menu
-helpmenu = tk.Menu(menu, tearoff=0)
-menu.add_cascade(label='Help', menu=helpmenu)
-helpmenu.add_command(label='About')
-
-root.mainloop()
+    def get_connection_data(self, ):
+        return self.connection_data
