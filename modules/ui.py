@@ -235,5 +235,5 @@ class ConnectionSettingsWindow:
 
         self.conn_screen.destroy()
 
-    def get_connection_data(self, ):
+    def get_connection_data(self):
         return self.connection_data

@@ -1,13 +1,27 @@
 import tkinter as tk
 from modules import project_file_management, ui
+connection1=None
 
 def open_conn_st_screen(parent):
-    ui.ConnectionSettingsWindow(parent)
+   global connection1
+   connection1 = ui.ConnectionSettingsWindow(parent)
+   
+def getconnection_setting():
+   global connection1
+   if connection1 is not None:
+      return connection1.get_connection_data()
+   else:
+      return None
+   
+def save_as_project():
+   data=getconnection_setting()
+   print(data)
+   if data is not None:
+      project_file_management.save_as_project(data)
+   else:
+      pass
 
-def get_settings(parent):
-    print(ui.ConnectionSettingsWindow(parent).get_connection_data())
-    return ui.ConnectionSettingsWindow(parent).get_connection_data()
-    
+      
 root = tk.Tk()
 root.geometry("350x450")
 root.minsize(350, 450)
@@ -23,7 +37,7 @@ menu.add_cascade(label='File', menu=filemenu)
 filemenu.add_command(label='New')
 filemenu.add_command(label='Open', command=project_file_management.open_project)
 filemenu.add_command(label="Save")
-filemenu.add_command(label="Save As", command=lambda: project_file_management.save_as_project(get_settings))
+filemenu.add_command(label="Save As", command=lambda: save_as_project())
 filemenu.add_command(label='Exit', command=root.quit)
 
 # Connection menu

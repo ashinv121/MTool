@@ -1,0 +1,7 @@
+{
+    "Ip address": "192.168.3.254",
+    "Port": "502",
+    "Response timeout": 100,
+    "Delay between polls": 100,
+    "connection timeout": "100"
+}
