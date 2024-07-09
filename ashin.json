@@ -1,7 +1,11 @@
 {
-    "Ip address": "192.168.3.254",
-    "Port": "502",
+    "Connection type": "Serial",
+    "COM port": "Com6",
+    "Baud rate": "9600 baud",
+    "Parity option": "None Parity",
+    "Stop bit option": "1 Stop Bit",
+    "Mode RTU": 1,
+    "Mode ASCII": 1,
     "Response timeout": 100,
-    "Delay between polls": 100,
-    "connection timeout": "100"
+    "Delay between polls": 100
 }
