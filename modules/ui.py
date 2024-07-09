@@ -10,7 +10,7 @@ class ConnectionSettingsWindow:
         self.conn_screen = tk.Toplevel()
         self.conn_screen.title("Connection Setting")
         self.conn_screen.resizable(False, False)
-        self.connection_type_string=connection_type_string
+        self.b=connection_type_string
 
         default={
                     "Connection type": "Serial",
@@ -26,39 +26,13 @@ class ConnectionSettingsWindow:
                     "Response timeout": 100,
                     "Delay between polls": 100
                     }
-
-
-        if self.connection_type_string == "Default":
+        self.connection_type_string=default
+        if self.b == "Default":
                 self.connection_type_string = default
-        elif self.connection_type_string["Connection type"] == "Serial":
-            self.connection_type_string.update({
-                "Ip address": "192.168.3.250",  
-                "Port": 502,
-                "connection timeout":100,
-                })
-        elif self.connection_type_string["Connection type"] == "Modbus TCP":
-             self.connection_type_string.update({
-                 "COM port": "Com6",
-                    "Baud rate": "9600 baud",
-                    "Parity option": "None Parity",
-                    "Stop bit option": "1 Stop Bit",
-                    "Mode RTU": 1,
-                    "Mode ASCII": 0,
-             })
-
-        elif self.connection_type_string["Connection type"] == "Modbus UDP":
-            self.connection_type_string.update({
-                 "COM port": "Com6",
-                    "Baud rate": "9600 baud",
-                    "Parity option": "None Parity",
-                    "Stop bit option": "1 Stop Bit",
-                    "Mode RTU": 1,
-                    "Mode ASCII": 0,
-                    "connection timeout":100,
-             })
+        else:
+            self.connection_type_string.update(self.b)
 
 
-        # Center the connection settings screen
         self.parent.update_idletasks()
         x = self.parent.winfo_x() + (self.parent.winfo_width() // 2) - (308 // 2)
         y = self.parent.winfo_y() + (self.parent.winfo_height() // 2) - (335 // 2)
